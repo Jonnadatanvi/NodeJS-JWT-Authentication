@@ -66,6 +66,10 @@
                         document.querySelector('h1.row').innerHTML = 'dashboard';
                         document.querySelector('main').innerHTML = res.data.myContent;
                         history.pushState({ page: 'dashboard' }, 'Dashboard', '/dashboard');
+                        var btn = document.createElement("Button");
+                        btn.innerHTML = "Settings";
+                        btn.setAttribute('onclick', 'getSettings();');
+                        document.querySelector('main').appendChild(btn);
                     } 
                 });
         }
