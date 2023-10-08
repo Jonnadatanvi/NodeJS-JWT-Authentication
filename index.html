@@ -29,6 +29,7 @@
             <div>
                 <button onclick="login()">Login</button>
                 <button onclick="getDashboard()">Get Dashboard</button>
+                <button onclick="getSettings()">Get Settings</button> <!-- button for settings -->
             </div>
         </main>
         
@@ -64,15 +65,53 @@
                     if (res && res.data && res.data.success) {
                         document.querySelector('h1.row').innerHTML = 'dashboard';
                         document.querySelector('main').innerHTML = res.data.myContent;
+                        history.pushState({ page: 'dashboard' }, 'Dashboard', '/dashboard');
                     } 
                 });
         }
 
+        function getSettings() {
+        const token = localStorage.getItem('jwt');
+        axios.get('/api/settings', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(res => {
+                if (res && res.data && res.data.success) {
+                    document.querySelector('h1.row').innerHTML = 'settings';
+                    document.querySelector('main').innerHTML = res.data.myContent;
+                    history.pushState({ page: 'settings' }, 'Settings', '/settings');                    
+                } 
+            })
+            .catch(error => {
+                // Handle unauthorized access or other errors
+                if (error.response && error.response.status === 401) {
+                    // Clear token from localStorage and reload the page to go back to login
+                    localStorage.removeItem('jwt');
+                    window.location.href = '/';
+                }
+            });
+        }
+
         function onLoad() {
-            const token = localStorage.getItem('jwt');
-            if (token) {
+            const path = window.location.pathname;
+
+            if (path === '/dashboard') {
                 getDashboard();
+            } else if (path === '/settings') {
+                getSettings();
             }
+
+            // Listen for back/forward navigation events
+            window.onpopstate = function(event) {
+                const path = window.location.pathname;
+                if (path === '/dashboard') {
+                    getDashboard();
+                } else if (path === '/settings') {
+                    getSettings();
+                }
+            };
         }
         onLoad();
     </script>
